@@ -183,11 +183,9 @@ async function ghFetch(url) {
         collab.forEach(u => knownMaintainers.current.add(u.login));
       } catch (e) {}
 
-      for (let i = 0; i < all.length; i++) {
-        setLoadingMsg(`Checking PRs & comments: ${i + 1}/${all.length}...`);
-        const info = await checkPRsForIssue(all[i]);
-        all[i] = { ...all[i], ...info };
-      }
+      setLoadingMsg(`Checking PRs & comments for ${all.length} issues...`);
+const results = await Promise.all(all.map(issue => checkPRsForIssue(issue)));
+all = all.map((issue, i) => ({ ...issue, ...results[i] }));
 
       setIssues(all);
     } catch (e) {
